@@ -20,7 +20,7 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def get_sorted_list_of_files(root_folder_path):
+def get_list_of_files(root_folder_path):
     if not root_folder_path:
         return None
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         filepath = None
 
     if filepath:
-        files_list = get_sorted_list_of_files(filepath)
+        files_list = get_list_of_files(filepath)
 
         duplicate_list = efficiently_get_duplicates(files_list)
 
