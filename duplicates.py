@@ -2,8 +2,7 @@ import argparse
 import sys
 import os
 from os.path import getsize, join
-from itertools import combinations
-import time
+
 
 def parse_args(args):
 
