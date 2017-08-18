@@ -9,16 +9,16 @@ script require python3.5
 Example of script launch on Linux, Python 3.5:
 
 ```#!bash
-$ python duplicates.py.py <directory>
+$ python duplicates.py <directory>
 # possibly requires call of python3 executive instead of just python
 
 # output example
 $ python duplicates.py /Users/John/Documents
 
-test/two/Poland.pdf
-test/two/two_A/Poland.pdf
-test/two/Airbnb.pdf
-test/two/.DS_Store
+Documents/September/Poland.pdf
+Documents/October/Referenses/Poland.pdf
+Documents/October/Airbnb.pdf
+Documents/October/.DS_Store
 
 $ python duplicates.py -h
 
