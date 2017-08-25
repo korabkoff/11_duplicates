@@ -44,7 +44,7 @@ def efficiently_get_duplicates(files_list):
         if dublicates > 0:
             dublicates -= 1
         else:
-            file = files_list[index]
+            reference_file = files_list[index]
             get_next_file = True
 
             while get_next_file:
@@ -52,7 +52,7 @@ def efficiently_get_duplicates(files_list):
                 if next_index <= files_list_len:
                     next_file = (files_list[next_index])
 
-                    if file[1:] == next_file[1:]:
+                    if reference_file[1:] == next_file[1:]:
                         dublicates_list.append(join(next_file[0], next_file[1]))
                         dublicates += 1
                     else:
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     try:
         parser = parse_args(sys.argv[1:])
         filepath = parser.filepath
-    except Exception as e:
+    except OSError as e:
         print(e)
         filepath = None
 
