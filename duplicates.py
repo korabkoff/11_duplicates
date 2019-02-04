@@ -2,19 +2,20 @@ import argparse
 import sys
 import os
 from os.path import getsize, join
+from collections import Counter
+
+
+def readable_dir(prospective_dir):
+    if not os.path.isdir(prospective_dir):
+        raise argparse.ArgumentTypeError("'{0}' is not a valid path".format(prospective_dir))
+
+    elif os.access(prospective_dir, os.R_OK):
+        return prospective_dir
+    else:
+        raise argparse.ArgumentTypeError("'{0}' is not a readable dir".format(prospective_dir))
 
 
 def parse_args(args):
-
-    def readable_dir(prospective_dir):
-        if not os.path.isdir(prospective_dir):
-            raise OSError("'{0}' is not a valid path".format(prospective_dir))
-        elif os.access(prospective_dir, os.R_OK):
-            return prospective_dir
-        else:
-            raise OSError("'{0}' is not a readable dir".format(prospective_dir))
-
-
     parser = argparse.ArgumentParser(description='Show duplicates of files in given folder and subfolders')
     parser.add_argument('filepath', help='File path to folder', type=readable_dir, default=None)
     return parser.parse_args(args)
@@ -24,43 +25,28 @@ def get_list_of_files(root_folder_path):
     if not root_folder_path:
         return None
 
-    list_of_dir_name_size = []
+    list_of_dir_name_size = list()
 
     # get all files in subdirectories
     for root, folders, files in os.walk(root_folder_path):
-        list_of_dir_name_size.extend(((root, filename, getsize(join(root, filename)))
-                            for filename in files))
+        for filename in files:
+            dir_name_size = (root, filename, str(getsize(join(root, filename))))
+            list_of_dir_name_size.append(dir_name_size)
+
     return list_of_dir_name_size
 
 
-def efficiently_get_duplicates(files_list):
+def get_duplicates(list_of_dir_name_size):
+    list_namesize = ['{}{}'.format(item[1], item[2]) for item in list_of_dir_name_size]
+    dict_filesize_n_count = Counter(list_namesize)
 
-    files_list = sorted(files_list, key=lambda file_size: file_size[2], reverse=True)
-
-    dublicates_list = []
-    dublicates = 0
-    files_list_len = len(files_list)-1
-    for index in range(files_list_len):
-        if dublicates > 0:
-            dublicates -= 1
-        else:
-            reference_file = files_list[index]
-            get_next_file = True
-
-            while get_next_file:
-                next_index = index+1+dublicates
-                if next_index <= files_list_len:
-                    next_file = (files_list[next_index])
-
-                    if reference_file[1:] == next_file[1:]:
-                        dublicates_list.append(join(next_file[0], next_file[1]))
-                        dublicates += 1
-                    else:
-                        get_next_file = False
-                else:
-                    get_next_file = False
-
-    return(dublicates_list)
+    dubs = []
+    for filesize, count in dict_filesize_n_count.items():
+        if count > 1:
+            for dir_name_size in list_of_dir_name_size:
+                if dir_name_size[1] + dir_name_size[2] == filesize:
+                    dubs.append('{}/{}'.format(dir_name_size[0], dir_name_size[1]))
+    return dubs
 
 
 if __name__ == '__main__':
@@ -70,13 +56,10 @@ if __name__ == '__main__':
         filepath = parser.filepath
     except OSError as e:
         print(e)
-        filepath = None
+        exit()
 
-    if filepath:
-        files_list = get_list_of_files(filepath)
-
-        duplicate_list = efficiently_get_duplicates(files_list)
-
-        for duplicate in duplicate_list:
-            print(duplicate)
+    list_of_dir_name_size = (get_list_of_files(filepath))
+    dubs = get_duplicates(list_of_dir_name_size)
+    for dub in dubs:
+        print(dub)
 
